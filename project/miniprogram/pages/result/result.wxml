@@ -1,0 +1,58 @@
+<!--pages/result/result.wxml-->
+<view class="page">
+  <view class="card">
+    <view class="hero fade-up">
+      <image class="logo" src="/assets/logo.png" mode="aspectFit" binderror="onLogoError"></image>
+      <view wx:if="{{logoMissing}}" class="logo logo-fallback">V</view>
+      <view class="hero-label">你的英语词汇量估计</view>
+      <view class="big-num">{{displayNum}}</view>
+      <view class="hero-unit">个词</view>
+      <view class="ci">95% 置信区间: {{result.ciLower}} ~ {{result.ciUpper}}</view>
+      <view class="level-badge" style="background:{{result.level.color}}22;color:{{result.level.color}}">
+        {{result.level.name}} · {{result.level.en}}
+      </view>
+    </view>
+
+    <view wx:if="{{!result.reliable}}" class="warn">
+      ⚠️ 检测到较多不确定作答(假词误报率 {{fprPct}}%),结果可能偏高,建议重新测试。
+    </view>
+
+    <view class="section">
+      <view class="section-title">各词频层掌握情况</view>
+      <view wx:for="{{result.layers}}" wx:key="layer_id" class="layer-bar">
+        <view class="layer-label">{{item.label}}{{item.asked_count > 0 ? ' (实测 ' + item.correct_count + '/' + item.asked_count + ')' : ''}}</view>
+        <view class="layer-track">
+          <view class="layer-fill" style="width:{{item.percentPct}}%;"></view>
+        </view>
+        <view class="layer-percent">{{item.percentPct}}%</view>
+      </view>
+    </view>
+
+    <view wx:if="{{result.unknownWords.length}}" class="section">
+      <view class="section-title">不认识的词 (共 {{result.unknownWords.length}} 个)</view>
+      <view class="unknown-tip">建议优先复习以下单词:</view>
+      <view wx:for="{{result.unknownWords}}" wx:key="word" class="unknown-item">
+        <view class="unknown-word">{{item.word}}</view>
+        <view class="unknown-meaning">{{item.meaning}}{{item.layerLabel ? ' · ' + item.layerLabel : ''}}</view>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="btn" bindtap="goTest">再测一次</button>
+      <button class="btn btn-ghost" bindtap="makeCard">生成分享卡片</button>
+    </view>
+
+    <view class="share-name-row">
+      <text class="share-name-label">卡片署名</text>
+      <input class="share-name-input" type="text" maxlength="8"
+        placeholder="输入你的名字 (可选)" value="{{cardName}}" bindinput="onNameInput" />
+    </view>
+
+    <view wx:if="{{cardReady}}" class="card-preview">
+      <canvas canvas-id="shareCard" id="shareCard" class="share-canvas"></canvas>
+      <button class="btn btn-secondary btn-block" bindtap="saveAlbum">保存到相册</button>
+    </view>
+
+    <view class="note">说明: 词汇量按词元(lemma)估算,基于 Rasch 模型对词库内全部真实词求认识概率之和。</view>
+  </view>
+</view>

@@ -1,0 +1,136 @@
+/* pages/result/result.wxss */
+.page { padding: 16rpx 0; }
+
+.hero { text-align: center; padding: 32rpx 0; }
+.logo {
+  width: 120rpx; height: 120rpx;
+  border-radius: 30rpx;
+  margin: 0 auto 32rpx;
+  background: #F7E9DF;
+}
+.logo-fallback {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64rpx; font-weight: 700; color: #C97B5A;
+}
+.hero-label { color: #8B7355; font-size: 28rpx; }
+.big-num {
+  font-size: 128rpx; font-weight: 800; color: #C97B5A;
+  line-height: 1.1; margin: 16rpx 0;
+}
+.hero-unit { color: #8B7355; font-size: 30rpx; }
+.ci { color: #6B5D55; font-size: 26rpx; margin-top: 16rpx; }
+.level-badge {
+  display: inline-block;
+  margin-top: 24rpx;
+  padding: 14rpx 40rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
+.warn {
+  margin-top: 32rpx;
+  padding: 28rpx 32rpx;
+  background: #FBF3E0;
+  border: 1rpx solid #E8D5A0;
+  color: #8B6914;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+}
+
+.section { margin-top: 48rpx; }
+.section-title { font-size: 32rpx; color: #3D3530; margin-bottom: 28rpx; font-weight: 600; }
+
+.layer-bar {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+.layer-label { flex: 0 0 240rpx; color: #6B5D55; font-size: 24rpx; }
+.layer-track { flex: 1; height: 24rpx; background: #F5F1EA; border-radius: 999rpx; overflow: hidden; }
+.layer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #C97B5A, #E0A86E);
+  border-radius: 999rpx;
+  transition: width 0.8s ease;
+}
+.layer-percent {
+  flex: 0 0 80rpx; text-align: right; color: #3D3530;
+  font-size: 26rpx; font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 48rpx;
+}
+.actions .btn { flex: 1; }
+
+.note {
+  margin-top: 48rpx;
+  text-align: center;
+  color: #8B7355;
+  font-size: 22rpx;
+}
+
+.card-preview {
+  margin-top: 32rpx;
+}
+.share-canvas {
+  width: 600rpx;
+  height: 800rpx;
+  display: block;
+  margin: 0 auto 24rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(61, 53, 48, 0.12);
+}
+
+/* 不认识词清单 */
+.unknown-tip {
+  font-size: 24rpx;
+  color: #8a7563;
+  margin-bottom: 16rpx;
+}
+.unknown-item {
+  padding: 20rpx 24rpx;
+  background: #F9F2EC;
+  border: 1rpx solid #EAD9C8;
+  border-radius: 20rpx;
+  margin-bottom: 12rpx;
+}
+.unknown-word {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 30rpx;
+  color: #3D3530;
+}
+.unknown-meaning {
+  font-size: 24rpx;
+  color: #8a7563;
+  margin-top: 6rpx;
+  line-height: 1.5;
+}
+
+/* 卡片署名输入 */
+.share-name-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+.share-name-label {
+  font-size: 26rpx;
+  color: #8a7563;
+  white-space: nowrap;
+}
+.share-name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 16rpx 28rpx;
+  font-size: 28rpx;
+  color: #3D3530;
+  background: #F5F1EA;
+  border: 2rpx solid #E8E0D5;
+  border-radius: 20rpx;
+}

@@ -1,0 +1,20 @@
+<!--pages/history/history.wxml-->
+<view class="page">
+  <view class="card">
+    <view class="section-title">词汇量趋势</view>
+    <canvas canvas-id="chart" id="chart" class="chart"></canvas>
+
+    <view class="section-title section-title-2">历史记录</view>
+    <view wx:if="{{history.length === 0}}" class="empty">
+      还没有测试记录,
+      <navigator url="/pages/test/test" class="link">开始第一次测试</navigator>
+      吧~
+    </view>
+    <view wx:else>
+      <view wx:for="{{history}}" wx:key="ts" class="history-item">
+        <view class="h-date">{{item.dateText}}{{item.levelName ? ' · ' + item.levelName : ''}}</view>
+        <view class="h-val">{{item.vocabSize}} 词</view>
+      </view>
+    </view>
+  </view>
+</view>

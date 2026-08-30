@@ -1,0 +1,28 @@
+/* pages/history/history.wxss */
+.page { padding: 16rpx 0; }
+
+.section-title { font-size: 32rpx; color: #3D3530; margin-bottom: 24rpx; font-weight: 600; }
+.section-title-2 { margin-top: 48rpx; }
+
+.chart { width: 100%; height: 360rpx; margin-bottom: 24rpx; }
+
+.empty {
+  text-align: center;
+  color: #8B7355;
+  padding: 80rpx 32rpx;
+  font-size: 28rpx;
+}
+.link { color: #C97B5A; }
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx 36rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E8E0D5;
+  border-radius: 24rpx;
+  margin-bottom: 16rpx;
+}
+.h-date { color: #8B7355; font-size: 26rpx; }
+.h-val { font-size: 36rpx; font-weight: 700; color: #C97B5A; }

@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/test/test",
+    "pages/result/result",
+    "pages/history/history"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FAF9F5",
+    "navigationBarTitleText": "词汇量测试",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAF9F5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

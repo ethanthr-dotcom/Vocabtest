@@ -1,0 +1,48 @@
+<!--pages/home/home.wxml-->
+<view class="page">
+  <view class="card fade-up">
+    <view class="hero">
+      <image wx:if="{{!logoMissing}}" class="logo" src="/assets/logo.png" mode="aspectFit" binderror="onLogoError"></image>
+      <view wx:else class="logo logo-fallback">V</view>
+
+      <view class="title">测测你的英语词汇量</view>
+      <view class="subtitle">自适应抽题 · 三题型交叉验证 · 假词防虚报</view>
+
+      <view class="mode-select">
+        <view class="mode-card">
+          <view class="mode-title">⚡ 快速测试</view>
+          <view class="mode-desc">50 题 · 约 6 分钟
+快速估计词汇量水平</view>
+          <button class="btn btn-lg btn-block" bindtap="goQuick">开始测试</button>
+        </view>
+        <view class="mode-card">
+          <view class="mode-title">🎯 精准测试</view>
+          <view class="mode-desc">120 题 · 约 15 分钟
+更高精度 + 详细分层报告</view>
+          <button class="btn btn-lg btn-block" bindtap="goPrecise">开始测试</button>
+        </view>
+      </view>
+
+      <view wx:if="{{lastResult}}" class="home-last">
+        <view class="label">最近一次成绩</view>
+        <view class="value">{{lastResult.vocabSize}} 词</view>
+        <view class="meta">{{lastResult.level.name}} · {{lastDateText}}</view>
+      </view>
+
+      <view class="features">
+        <view class="feature">
+          <text class="icon">📚</text>
+          <text class="text">2 万+ 词库</text>
+        </view>
+        <view class="feature">
+          <text class="icon">🎯</text>
+          <text class="text">自适应抽题</text>
+        </view>
+        <view class="feature">
+          <text class="icon">🛡️</text>
+          <text class="text">假词防虚报</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

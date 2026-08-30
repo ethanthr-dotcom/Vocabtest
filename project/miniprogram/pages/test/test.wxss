@@ -1,0 +1,88 @@
+/* pages/test/test.wxss */
+.page { padding: 16rpx 0; }
+
+.progress-wrap { margin-bottom: 40rpx; }
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  color: #8B7355;
+  font-size: 26rpx;
+  margin-bottom: 16rpx;
+}
+.progress-label .hint { color: #8B7355; }
+.progress-bar {
+  height: 16rpx;
+  background: #F5F1EA;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #C97B5A, #E0A86E);
+  border-radius: 999rpx;
+  transition: width 0.3s ease;
+}
+
+.word-card {
+  text-align: center;
+  padding: 80rpx 32rpx;
+  margin-bottom: 40rpx;
+}
+.word-hint { color: #8B7355; font-size: 26rpx; }
+.word {
+  font-size: 88rpx;
+  font-weight: 700;
+  color: #3D3530;
+  margin: 32rpx 0;
+  letter-spacing: 1rpx;
+  word-break: break-word;
+}
+
+.buttons {
+  display: flex;
+  gap: 24rpx;
+}
+.buttons .btn { flex: 1; }
+
+.encourage {
+  text-align: center;
+  color: #8B7355;
+  font-size: 24rpx;
+  margin-top: 32rpx;
+  min-height: 36rpx;
+}
+
+/* 释义选择题 */
+.meaning-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.meaning-option {
+  width: 100%;
+  padding: 32rpx 40rpx;
+  background: #F5F1EA;
+  color: #3D3530;
+  border: 2rpx solid #E8E0D5;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  text-align: left;
+  line-height: 1.5;
+}
+.meaning-option::after { border: none; }
+.meaning-option:active { background: #F7E9DF; }
+.meaning-option.opt-correct {
+  background: #E8F0E0;
+  border-color: #9CB890;
+  color: #4A6B3A;
+}
+.meaning-option.opt-wrong {
+  background: #F5E0DC;
+  border-color: #D49B95;
+  color: #A04A40;
+}
+.meaning-option.meaning-unknown {
+  border-style: dashed;
+  color: #8a7563;
+  font-style: italic;
+}

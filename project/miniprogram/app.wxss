@@ -1,0 +1,77 @@
+/* ===== 全局样式 · 温暖主题 (类 Claude) ===== */
+page {
+  background: #FAF9F5;
+  color: #3D3530;
+  font-family: Georgia, "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif;
+  font-size: 32rpx;
+  line-height: 1.7;
+}
+
+/* CSS 变量在小程序中通过 class 复用,这里定义常用色 */
+.bg { background: #FAF9F5; }
+.bg-soft { background: #F5F1EA; }
+.surface { background: #FFFFFF; }
+.text-primary { color: #C97B5A; }
+.text-main { color: #3D3530; }
+.text-soft { color: #6B5D55; }
+.text-muted { color: #8B7355; }
+.text-center { text-align: center; }
+.hidden { display: none; }
+
+/* 卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 48rpx;
+  box-shadow: 0 8rpx 48rpx rgba(61, 53, 48, 0.06);
+  border: 1rpx solid #E8E0D5;
+  margin: 32rpx 24rpx;
+}
+
+/* 按钮 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx 64rpx;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  background: #C97B5A;
+  color: #fff;
+  box-shadow: 0 8rpx 28rpx rgba(201, 123, 90, 0.25);
+  transition: transform 0.12s ease, background 0.2s;
+}
+.btn::after { border: none; }
+.btn:active { transform: scale(0.96); background: #B86A4A; }
+.btn-block { width: 100%; }
+.btn-lg { padding: 36rpx 80rpx; font-size: 36rpx; }
+.btn-ghost {
+  background: transparent;
+  color: #C97B5A;
+  border: 2rpx solid #E8D5C8;
+  box-shadow: none;
+}
+.btn-ghost:active { background: #F7E9DF; }
+.btn-secondary {
+  background: #F5F1EA;
+  color: #3D3530;
+  box-shadow: none;
+  border: 2rpx solid #E8E0D5;
+}
+.btn-secondary:active { background: #EFE8DD; }
+
+/* 动画 */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease both; }
+
+@keyframes pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop { animation: pop 0.3s ease both; }

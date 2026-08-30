@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试结果 · 词汇量测试</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo">
+      <span>词汇量测试</span>
+    </div>
+    <nav>
+      <a href="index.html" data-page="home" class="active">首页</a>
+      <a href="history.html" data-page="history">历史</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="card">
+      <div class="result-hero fade-up">
+        <img src="assets/logo.svg" alt="logo" class="home-logo">
+        <div class="muted" id="resultTitle">你的英语词汇量估计</div>
+        <div id="bigNum" class="result-number">0</div>
+        <div class="result-unit" id="resultUnit">个词</div>
+        <div id="ci" class="result-ci">95% 置信区间: -- ~ --</div>
+        <div id="levelBadge" class="result-level hidden"></div>
+      </div>
+
+      <div id="warn" class="result-warn hidden"></div>
+
+      <div class="result-section">
+        <h3 id="layersTitle">各词频层掌握情况</h3>
+        <div id="layers"></div>
+      </div>
+
+      <div id="unknownSection" class="result-section hidden">
+        <h3>不认识的词 (共 <span id="unknownCount">0</span> 个)</h3>
+        <p class="muted" style="font-size:13px;">以下为本轮测试中答错或明确不认识的词, 建议优先复习:</p>
+        <div id="unknownWords" class="unknown-list"></div>
+      </div>
+
+      <div class="result-actions">
+        <a href="test.html?mode=standard&count=50" class="btn" id="retestBtn">再测一次</a>
+        <button id="shareBtn" class="btn btn-ghost">生成分享卡片</button>
+      </div>
+
+      <div class="share-name-row">
+        <label for="nameInput">卡片署名</label>
+        <input id="nameInput" type="text" maxlength="10" placeholder="输入你的名字 (可选)" autocomplete="off">
+      </div>
+
+      <div id="cardWrap" class="card-preview hidden">
+        <canvas id="shareCanvas" width="750" height="1000"></canvas>
+        <a id="downloadLink" class="btn btn-secondary btn-block mt-16" download="vocab-result.png">下载图片</a>
+      </div>
+
+      <div class="result-section muted text-center" style="font-size:12px;">
+        <p id="resultNote">说明: 词汇量按词元(lemma)估算,基于 Rasch 模型对词库内全部真实词求认识概率之和。</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/algorithm.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/result.js"></script>
+</body>
+</html>

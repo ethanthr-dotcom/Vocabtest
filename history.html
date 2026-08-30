@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>历史记录 · 词汇量测试</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo">
+      <span>词汇量测试</span>
+    </div>
+    <nav>
+      <a href="index.html" data-page="home">首页</a>
+      <a href="history.html" data-page="history" class="active">历史</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="card">
+      <h3 style="margin-bottom:16px;">词汇量趋势</h3>
+      <svg id="chart" class="history-chart" viewBox="0 0 720 200" preserveAspectRatio="none"></svg>
+
+      <h3 style="margin:24px 0 16px;">历史记录</h3>
+      <ul id="list" class="history-list"></ul>
+    </div>
+  </main>
+
+  <script src="js/algorithm.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/history.js"></script>
+</body>
+</html>

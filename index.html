@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>词汇量测试 · VocabTest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo">
+      <span>词汇量测试</span>
+    </div>
+    <nav>
+      <a href="index.html" data-page="home" class="active">首页</a>
+      <a href="history.html" data-page="history">历史</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="card home-hero fade-up">
+      <img src="assets/logo.svg" alt="logo" class="home-logo">
+      <h1 class="home-title">测测你的英语词汇量</h1>
+      <p class="home-subtitle">自适应抽题 · 三题型交叉验证 · 假词防虚报</p>
+
+      <div class="mode-select">
+        <div class="mode-card">
+          <div class="mode-title">⚡ 快速测试</div>
+          <div class="mode-desc">50 题 · 约 6 分钟<br>快速估计词汇量水平</div>
+          <a href="test.html?mode=standard&count=50" class="btn btn-lg btn-block">开始测试</a>
+        </div>
+        <div class="mode-card">
+          <div class="mode-title">🎯 精准测试</div>
+          <div class="mode-desc">120 题 · 约 15 分钟<br>更高精度 + 详细分层报告</div>
+          <a href="test.html?mode=standard&count=120" class="btn btn-lg btn-block">开始测试</a>
+        </div>
+      </div>
+
+      <div id="lastResult" class="home-last hidden">
+        <div class="label">最近一次成绩</div>
+        <div class="value"><span id="lastVal">--</span> 词</div>
+        <div class="meta" id="lastMeta">--</div>
+      </div>
+
+      <div class="home-features">
+        <div class="feature">
+          <div class="icon">📚</div>
+          <div class="text">2 万+ 词库</div>
+        </div>
+        <div class="feature">
+          <div class="icon">🎯</div>
+          <div class="text">自适应抽题</div>
+        </div>
+        <div class="feature">
+          <div class="icon">🛡️</div>
+          <div class="text">假词防虚报</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/algorithm.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    App.ALGO = VocabAlgorithm;
+    App.setActiveNav("home");
+    (function () {
+      var last = Storage.getLast();
+      if (last) {
+        document.getElementById("lastResult").classList.remove("hidden");
+        document.getElementById("lastVal").textContent = last.vocabSize;
+        document.getElementById("lastMeta").textContent =
+          (last.level ? last.level.name + " · " : "") + App.formatDate(last.ts);
+      }
+    })();
+  </script>
+</body>
+</html>

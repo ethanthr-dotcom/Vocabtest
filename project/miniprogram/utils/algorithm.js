@@ -720,14 +720,18 @@
         var wgt = 1;
         // 3PL 一致性: 猜测参数 c 按题型固定, 不随作答结果变化
         // (之前"答对 c=0/答错 c=0.25"的写法会让乱猜猜对的难题变成纯能力证据, 系统性推高 θ)
+        // 低频层(L5+)猜测基线分档: 4选1中文释义有语义先验, 乱猜命中率 0.40+;
+        // know 题"眼熟"虚报更严重. 提 c 让 θ 估计吸收乱猜噪声,
+        // 防止 L5+ 乱猜推高全局 θ -> mIrt 先验拉高所有层 -> 总量虚高
+        var isLowFreqLayer = lid != null && lid >= 5;
         if (q.qtype === QTYPE_MEANING || q.qtype === QTYPE_SYN) {
-          cGuess = CONFIG.CHOICE_C;
+          cGuess = isLowFreqLayer ? 0.40 : CONFIG.CHOICE_C;
         } else {
           // know 题: "眼熟就算认识"虚报基线 + 降权
-          cGuess = CONFIG.KNOW_C;
+          cGuess = isLowFreqLayer ? 0.50 : CONFIG.KNOW_C;
           wgt = CONFIG.KNOW_WEIGHT;
         }
-        if (lid != null && lid >= 5) {
+        if (isLowFreqLayer) {
           wgt *= CONFIG.LOW_LAYER_WEIGHT;
         }
         session.responses.push({
@@ -759,8 +763,13 @@
   }
 
   // 分层实测掌握率 (两模式通用): 按题型校正行为基线, 选择题权重高于 know 题
-  // choice: obs = 0.92m + 0.12(1-m)  ->  m = (obs-0.12)/0.80  (0.12=乱猜有效命中率)
-  // know:   obs = m + KNOW_C(1-m)    ->  m = (obs-KNOW_C)/(1-KNOW_C)
+  // 分档基线 (防虚高核心): 高频层(L1-L4)学生真实水平所在, 用标准基线;
+  // 低频层(L5+)学生几乎全靠乱猜, 4 选 1 中文释义有语义先验, 有效乱猜命中率 0.30+,
+  // 若仍用 0.12 基线, L5/L6/L7(count 5000-10000)掌握率被高估 3 倍 -> 总量虚高数千词
+  //   高频层:  choice obs=0.92m+0.12(1-m) -> m=(obs-0.12)/0.80
+  //            know   obs=m+0.30(1-m)      -> m=(obs-0.30)/0.70
+  //   低频层:  choice obs=0.92m+0.30(1-m) -> m=(obs-0.30)/0.62
+  //            know   obs=m+0.50(1-m)      -> m=(obs-0.50)/0.50
   function stratifiedMastery(session, layerId) {
     var nKnow = 0, obsKnow = 0, nChoice = 0, obsChoice = 0;
     session.responses.forEach(function (r) {
@@ -773,20 +782,27 @@
         obsChoice += r.u;
       }
     });
+    // 低频层(L5+)用更严格基线扣除; 靶向模式册别5/6词数少, 严格扣也合理
+    var isLowFreq = layerId != null && layerId >= 5;
+    var choiceBase = isLowFreq ? 0.30 : 0.12;
+    var choiceDenom = isLowFreq ? 0.62 : 0.80;   // 0.92 - choiceBase
+    var knowBase = isLowFreq ? 0.50 : CONFIG.KNOW_C;
+    var knowDenom = isLowFreq ? 0.50 : (1 - CONFIG.KNOW_C);  // 1 - knowBase
     // 选择题证据权重 1.0; know 题虚报基线个体差异大, 权重降至 0.3
     var num = 0, den = 0;
     if (nChoice >= 2) {
-      num += nChoice * clamp01((obsChoice / nChoice - 0.12) / 0.80);
+      num += nChoice * clamp01((obsChoice / nChoice - choiceBase) / choiceDenom);
       den += nChoice;
     }
     if (nKnow >= 2) {
-      var mk = clamp01((obsKnow / nKnow - CONFIG.KNOW_C) / (1 - CONFIG.KNOW_C));
+      var mk = clamp01((obsKnow / nKnow - knowBase) / knowDenom);
       num += 0.3 * nKnow * mk;
       den += 0.3 * nKnow;
     }
     if (den === 0) return null;
     return num / den;
   }
+
 
   function clamp01(x) {
     if (x < 0) return 0;

@@ -408,18 +408,53 @@
   function selectRealWord(session, processed, theta) {
     var coverage = session.layerCoverage;
 
-    // 配额制: 选 已测/配额 比例最低且有剩余词的层
-    var targetLayer = null;
-    var bestRatio = Infinity;
+    // 候选: 有剩余词 且 未达配额 的层
+    var eligible = [];
     processed.layers.forEach(function (L) {
       if (!L.words.length || !layerHasUnused(session, L)) return;
-      var quota = layerQuota(session, processed, L);
-      var ratio = (coverage[L.id] || 0) / quota;
-      if (ratio < bestRatio - 1e-9) {
-        bestRatio = ratio;
-        targetLayer = L;
-      }
+      if ((coverage[L.id] || 0) >= layerQuota(session, processed, L)) return;
+      eligible.push(L);
     });
+
+    var targetLayer = null;
+    if (eligible.length) {
+      if (session.questionNumber < 12) {
+        // 前期: 配额轮转 (θ 与各层掌握率尚不可靠, 先均匀探测)
+        var bestRatio = Infinity;
+        eligible.forEach(function (L) {
+          var ratio = (coverage[L.id] || 0) / layerQuota(session, processed, L);
+          if (ratio < bestRatio - 1e-9) {
+            bestRatio = ratio;
+            targetLayer = L;
+          }
+        });
+      } else {
+        // 后期: Neyman 最优分配 — 选题投向"对总估计方差贡献最大"的层
+        // 单层方差贡献 ∝ count² · m̂(1-m̂) / (n+1)
+        // 注意 ph 必须用"校正后掌握率"(扣除猜测/虚报基线):
+        // 若用 raw 正确率, 低掌握层的 ph(1-ph) 被基线虚高 ~10 倍, 会吸走过量题目
+        var bestScore = -1;
+        var bestLayers = [];
+        eligible.forEach(function (L) {
+          var n = coverage[L.id] || 0;
+          var c = session.layerCorrect ? (session.layerCorrect[L.id] || 0) : 0;
+          // raw 率 Laplace 平滑
+          var raw = (c + 1) / (n + 2);
+          // 校正: 扣除约 0.3 的猜测/虚报基线 (题型混合), 映射到真实掌握率
+          var ph = clamp01((raw - 0.30) / 0.62);
+          var score = L.count * L.count * ph * (1 - ph) / (n + 1);
+          if (score > bestScore * 1.15) {
+            bestScore = score;
+            bestLayers = [L];
+          } else if (score > bestScore / 1.15) {
+            bestLayers.push(L);
+          }
+        });
+        if (bestLayers.length) {
+          targetLayer = bestLayers[Math.floor(Math.random() * bestLayers.length)];
+        }
+      }
+    }
 
     if (targetLayer) {
       var pool = [];
@@ -647,6 +682,7 @@
       askedIds: new Set(),
       excludeIds: excludeIds || null,
       layerCoverage: {},
+      layerCorrect: {},       // layerId -> 答对数 (Neyman 分配用)
       pseudoMarkedKnown: 0,
       pseudoTotal: 0,
       thetaEstimated: false,
@@ -676,6 +712,7 @@
       var lid = w.layer_id;
       if (lid != null) {
         session.layerCoverage[lid] = (session.layerCoverage[lid] || 0) + 1;
+        if (known) session.layerCorrect[lid] = (session.layerCorrect[lid] || 0) + 1;
       }
       if (reactionTime == null || reactionTime >= CONFIG.MIN_RT_MS) {
         var uRaw = known ? 1 : 0;
@@ -736,7 +773,7 @@
         obsChoice += r.u;
       }
     });
-    // 选择题证据权重 1.0; know 题虚报风险高, 权重 0.5
+    // 选择题证据权重 1.0; know 题虚报基线个体差异大, 权重降至 0.3
     var num = 0, den = 0;
     if (nChoice >= 2) {
       num += nChoice * clamp01((obsChoice / nChoice - 0.12) / 0.80);
@@ -744,8 +781,8 @@
     }
     if (nKnow >= 2) {
       var mk = clamp01((obsKnow / nKnow - CONFIG.KNOW_C) / (1 - CONFIG.KNOW_C));
-      num += 0.5 * nKnow * mk;
-      den += 0.5 * nKnow;
+      num += 0.3 * nKnow * mk;
+      den += 0.3 * nKnow;
     }
     if (den === 0) return null;
     return num / den;
@@ -755,6 +792,27 @@
     if (x < 0) return 0;
     if (x > 1) return 1;
     return x;
+  }
+
+  // PAVA (pool adjacent violators algorithm): 输入按难度升序的 [{y, w}]
+  // 输出加权最小二乘意义下的单调不增序列 (层越难掌握率不升)
+  // 相邻"前层掌握率 < 后层"即违例 -> 池化为加权平均, 消除小样本噪声
+  function pavaNonIncreasing(items) {
+    var blocks = [];
+    for (var i = 0; i < items.length; i++) {
+      var b = { y: items[i].y, w: items[i].w, k: 1 };
+      while (blocks.length && blocks[blocks.length - 1].y < b.y) {
+        var prev = blocks.pop();
+        var w = prev.w + b.w;
+        b = { y: (prev.y * prev.w + b.y * b.w) / w, w: w, k: prev.k + b.k };
+      }
+      blocks.push(b);
+    }
+    var out = [];
+    for (var j = 0; j < blocks.length; j++) {
+      for (var t = 0; t < blocks[j].k; t++) out.push(blocks[j].y);
+    }
+    return out;
   }
 
   // ---------- 结果计算 ----------
@@ -777,26 +835,38 @@
       layerActual[r.layer_id].correct += r.u;
     });
 
-    var SHRINK = 5; // 先验权重: 实测 n 题对先验 5 题
-    var total = 0;
-    var variance = 0;
-
-    var layerResults = processed.layers.map(function (L) {
+    // ---- 两步估计: 实测×先验混合 + PAVA 保序平滑 ----
+    // PRIOR_W: 每层先验伪样本数, 随总题数自适应缩放。
+    // 题少时 (50 题) 每层样本小, 二项噪声 + clamp01 不对称截断会拉高均值 (右尾无界),
+    // 需更大先验权重压制; 题多时 (120 题) 数据可信, 先验退居次要。
+    var PRIOR_W = 6 * 50 / (session.totalQuestions || CONFIG.TOTAL_QUESTIONS);
+    var blended = processed.layers.map(function (L) {
       var act = layerActual[L.id] || { asked: 0, correct: 0 };
       // IRT 先验掌握率 (仅用层锚点, 不依赖层内伪排序)
       var mIrt = sigmoid(theta - (L.anchor || 0));
-      var mFinal = mIrt;
+      var y = mIrt, w = PRIOR_W;
       if (act.asked > 0) {
         var m = stratifiedMastery(session, L.id);
         if (m != null) {
-          mFinal = (act.asked * m + SHRINK * mIrt) / (act.asked + SHRINK);
+          y = (act.asked * m + PRIOR_W * mIrt) / (act.asked + PRIOR_W);
+          w = act.asked + PRIOR_W;
         }
       }
+      return { L: L, act: act, y: y, w: w };
+    });
+
+    // PAVA: 掌握率随层难度单调不增 (词汇学习的自然结构), 池化相邻违例消除小样本噪声
+    var smoothed = pavaNonIncreasing(blended.map(function (b) { return { y: b.y, w: b.w }; }));
+
+    var total = 0;
+    var variance = 0;
+    var layerResults = blended.map(function (b, i) {
+      var L = b.L;
+      var mFinal = smoothed[i];
       var layerEst = mFinal * L.count * CONFIG.CALIBRATION_FACTOR;
       total += layerEst;
       // 分层方差: 二项方差 (按有效样本量)
-      var nEff = act.asked + SHRINK;
-      variance += L.count * L.count * mFinal * (1 - mFinal) / nEff;
+      variance += L.count * L.count * mFinal * (1 - mFinal) / b.w;
 
       return {
         layer_id: L.id,
@@ -804,9 +874,9 @@
         known_estimate: Math.round(layerEst),
         total: L.count,
         percent: L.count > 0 ? (mFinal * 100) : 0,
-        asked_count: act.asked,
-        correct_count: Math.round(act.correct * 10) / 10,
-        actual_accuracy: act.asked > 0 ? Math.round(act.correct / act.asked * 100) : null
+        asked_count: b.act.asked,
+        correct_count: Math.round(b.act.correct * 10) / 10,
+        actual_accuracy: b.act.asked > 0 ? Math.round(b.act.correct / b.act.asked * 100) : null
       };
     });
 
